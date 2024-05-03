@@ -29,7 +29,7 @@
                         <div class="col-sm-2">
                             <input type="text" id="to-date" name="to_date" class="form-control form-control-sm">
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-auto">
                             <button id="plot-button" type="submit" class="btn btn-primary btn-sm">Plot</button>
                         </div>
             </div>
@@ -45,8 +45,9 @@
             </div>
             <div class="col-sm-6 p-3">
                 <h6>Machine Info</h6>
-                <div class="info-box" id="info-container" style="white-space:pre">
-                </div>
+                <table class="info-box" style="white-space:pre">
+                    <tbody id="info-container"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -78,8 +79,8 @@
         }
 
         function createPlots(data) {
-            const windowWidth = window.innerWidth * window.devicePixelRatio;
-            const windowHeight = window.innerHeight * window.devicePixelRatio;
+            const windowWidth = window.innerWidth //* window.devicePixelRatio;
+            const windowHeight = window.innerHeight //* window.devicePixelRatio;
             plots = {};
 
             let muSync = uPlot.sync("moo");
@@ -97,8 +98,8 @@
             };
 
             let optsShared = {
-                width: windowWidth * 0.4, // 80% of window width
-                height: windowHeight * 0.19, // 60% of window height
+                width: windowWidth * 0.5, // 80% of window width
+                height: windowHeight * 0.25, // 60% of window height
                 cursor: cursorOpts,
                 class: "plot-container",
             };
@@ -128,7 +129,8 @@
             let info = data.info;
             infoContainer.innerHTML = "";
             for (const key of Object.keys(info)) {
-                let html = `<span style="display: inline-block; width: 120px">${key}</span>` + `<span>${info[key]}</span><br>`;
+                // let span = `<span style="display: inline-block; width: 120px">${key}</span>` + `<span>${info[key]}</span><br>`;
+                let html = `<td>${key}</td><td>${info[key]}</td>`
                 infoContainer.innerHTML = infoContainer.innerHTML.concat(html);
             }
         }
