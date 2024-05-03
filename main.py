@@ -200,7 +200,7 @@ if __name__ == "__main__":
                                    backupCount=const.LOG_COUNT)
     log_handler = [rotating]
 
-    log_level = logging.INFO
+    log_level = logging.DEBUG
     logging.basicConfig(format=const.LOG_FORMAT,
                         handlers=log_handler,
                         level=log_level,
@@ -210,6 +210,7 @@ if __name__ == "__main__":
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server")
             httpd.server_close()
+            exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
 
