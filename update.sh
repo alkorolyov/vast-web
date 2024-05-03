@@ -8,11 +8,12 @@ NC='\033[0m' # No Color
 
 INSTALL_DIR="/opt/vast-web"
 DATA_DIR="/var/lib/vast-web"
+DB_PATH="/var/lib/vast-stats/vast.db"
 
-USER="vast-web"
-GROUP="vast-web"
+USER="vast-stats"
+GROUP="vast-stats"
 
-SERVICE_NAME='vast-web'
+echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
 if [[ $UID -ne 0 ]]; then
     echo "Installation should be run as root."
@@ -24,12 +25,18 @@ cd /tmp
 git clone https://github.com/alkorolyov/vast-web/
 cd vast-web/
 
-echo "=> Stop service"
-systemctl stop $SERVICE_NAME
+echo "=> Create project dir: $INSTALL_DIR $DATA_DIR"
+mkdir $INSTALL_DIR || rm -rf $INSTALL_DIR
+mkdir $DATA_DIR || echo "$DATA_DIR already exists"
+
+echo "=> Create $USER user/group"
+useradd -rs /bin/false $USER -d $INSTALL_DIR
 
 echo "=> Copy sources to $INSTALL_DIR"
 cp main.py $INSTALL_DIR
+cp update.sh $INSTALL_DIR
 cp -r src $INSTALL_DIR
+cp -r static $INSTALL_DIR
 chown -R $USER:$GROUP $INSTALL_DIR
 chown -R $USER:$GROUP $DATA_DIR
 

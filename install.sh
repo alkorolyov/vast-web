@@ -10,8 +10,8 @@ INSTALL_DIR="/opt/vast-web"
 DATA_DIR="/var/lib/vast-web"
 DB_PATH="/var/lib/vast-stats/vast.db"
 
-USER="vast-web"
-GROUP="vast-web"
+USER="vast-stats"
+GROUP="vast-stats"
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 

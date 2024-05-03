@@ -20,7 +20,6 @@ class VastDB:
         self.db_path = db_path
         self.conn = None
         signal.signal(signal.SIGTERM, self.sigterm_handler)
-        exit(0)
 
     def __enter__(self):
         try:
@@ -43,6 +42,7 @@ class VastDB:
         logging.warning("[SIGTERM] Closing db connection")
         if self.conn:
             self.conn.close()
+        exit(0)
 
 
     def execute(self, sql_query):
