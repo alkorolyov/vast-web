@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uPlot Example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.iife.min.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.min.css">
+<!--    <link rel="stylesheet" href="styles.css">-->
+</head>
+<body>
+    <div class="form-container">
+        <form id="plot-form">
+        <div class="row">
+            <div class="col-sm-6 offset-2">
+                <div class="row bg-light shadow rounded p-1">
+                        <label for="machine-id" class="col-auto col-form-label-sm">Machine ID:</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="machine-id" name="machine_id" class="form-control form-control-sm">
+                        </div>
+                        <label for="from-date" class="col-auto col-form-label-sm">From:</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="from-date" name="from_date" class="col-sm-1 form-control form-control-sm">
+                        </div>
+                        <label for="to-date" class="col-auto col-form-label-sm">To:</label>
+                        <div class="col-sm-2">
+                            <input type="text" id="to-date" name="to_date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-sm-2">
+                            <button id="plot-button" type="submit" class="btn btn-primary btn-sm">Plot</button>
+                        </div>
+            </div>
+            </div>
+        </div>
+
+        </form>
+    </div>
+    <div class="plot-container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="plots" id="plot-container"></div>
+            </div>
+            <div class="col-sm-6 p-3">
+                <h6>Machine Info</h6>
+                <div class="info-box" id="info-container" style="white-space:pre">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        const plotForm = document.getElementById("plot-form");
+        const plotContainer = document.getElementById("plot-container");
+        const infoContainer = document.getElementById("info-container");
+        let plots = null;
+
+        function singlePlot(timeseries, name, optsShared) {
+            let color = Colors.get();
+            const opts = {
+                ...optsShared,
+                series: [
+                    {},
+                    {
+                        label: name,
+                        stroke: color,
+                        fill: hexToRGBA(color, 0.1),
+                        width: 1/window.devicePixelRatio,
+                    },
+                ],
+            };
+            // let plotData = [timeseries[0], timeseries[1]]
+            plots[name] = new uPlot(opts, timeseries, plotContainer);
+        }
+
+        function createPlots(data) {
+            const windowWidth = window.innerWidth * window.devicePixelRatio;
+            const windowHeight = window.innerHeight * window.devicePixelRatio;
+            plots = {};
+
+            let muSync = uPlot.sync("moo");
+            let timeseries = data.timeseries;
+
+            const cursorOpts = {
+                lock: true,
+                focus: {
+                    prox: 16,
+                },
+                sync: {
+                    key: muSync.key,
+                    setSeries: true,
+                },
+            };
+
+            let optsShared = {
+                width: windowWidth * 0.4, // 80% of window width
+                height: windowHeight * 0.19, // 60% of window height
+                cursor: cursorOpts,
+                class: "plot-container",
+            };
+
+            for (const key of Object.keys(timeseries)) {
+                let plotData = [timeseries[key][0], timeseries[key][1]]
+                singlePlot(timeseries[key], key, optsShared);
+            }
+
+        }
+
+        function updatePlots(data) {
+            let timeseries = data.timeseries
+            console.log('plots', plots);
+            console.log('plots keys', Object.keys(plots));
+            // update existing plots with new data
+            for (const key of Object.keys(plots)) {
+                // console.log('key', key);
+                plots[key].setData(timeseries[key]);
+                // let plotTitle = document.getElementsByClassName("u-title");
+                // plotTitle[i].textContent = `machine_id: ${machineId}`;
+
+            }
+        }
+
+        function updateInfo(data) {
+            let info = data.info;
+            infoContainer.innerHTML = "";
+            for (const key of Object.keys(info)) {
+                let html = `<span style="display: inline-block; width: 120px">${key}</span>` + `<span>${info[key]}</span><br>`;
+                infoContainer.innerHTML = infoContainer.innerHTML.concat(html);
+            }
+        }
+
+        // Function to fetch data and update plot
+        function handleSubmitForm() {
+            // Get form values
+            const machineId = document.getElementById("machine-id").value;
+            const fromDate = document.getElementById("from-date").value;
+            const toDate = document.getElementById("to-date").value;
+            console.log(machineId, fromDate, toDate);
+
+            let url = getUrl(machineId, fromDate, toDate);
+
+            // Show loading spinner and disable button
+            showLoading();
+
+            // Fetch data from server
+            fetch(url)
+                .then(response => response.json())
+                .then(packed => unpackJSON(packed))
+                .then(data => {
+                    data.timeseries = fillMissingValues(data.timeseries);
+                    data.timeseries = costPerGPU(data.timeseries);
+                    return data;
+                })
+                .then(data => {
+                    // console.log(data);
+                    // console.log(data[0]);
+                    // Hide loading spinner and enable button
+                    hideLoading();
+
+                    updateInfo(data);
+
+                    if (plots) {
+                        updatePlots(data);
+                    } else {
+                        createPlots(data);
+                    }
+                })
+                .catch(error => {
+                    // Hide loading spinner and enable button
+                    hideLoading();
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Event listener to update plot when the form is submitted
+        plotForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            handleSubmitForm();
+        });
+
+    </script>
+
+</body>
+</html>
