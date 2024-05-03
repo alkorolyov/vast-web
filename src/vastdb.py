@@ -19,7 +19,6 @@ class VastDB:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.conn = None
-        signal.signal(signal.SIGTERM, self.sigterm_handler)
 
     def __enter__(self):
         try:
@@ -31,19 +30,15 @@ class VastDB:
             raise
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.conn:
-            self.conn.close()
+        self.close()
         if exc_type:
             msg = f"[DB] {exc_type} during Database Operations:{exc_val}\n{exc_tb}"
             logging.error(msg)
             raise
 
-    def sigterm_handler(self, signum, frame):
-        logging.warning("[SIGTERM] Closing db connection")
+    def close(self):
         if self.conn:
             self.conn.close()
-        exit(0)
-
 
     def execute(self, sql_query):
         try:

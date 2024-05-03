@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 from time import time
 
+
 import http.server
 import socketserver
 import signal
@@ -97,12 +98,10 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def handle_test_request(self) -> None:
-        vastdb = self.server.vastdb
-
         logging.getLogger().setLevel(logging.INFO)
         logging.info(f"Testing request 2 weeks data")
 
-        with VastDB(self.server.db_path) as vastdb:
+        with self.server.vastdb as vastdb:
             machines_list = vastdb.dbm.table_to_df('machine_host_map').machine_id.sample(10)
 
         times = []
@@ -123,7 +122,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_html(html_content.encode('utf-8'))
 
     def handle_stats_request(self, query_params: dict) -> dict | None:
-        with VastDB(self.server.db_path) as vastdb:
+        # with VastDB(self.server.db_path) as vastdb:
+        with self.server.vastdb as vastdb:
             try:
                 machine_id, from_ts, to_ts = parse_params(query_params)
             except ValueError as e:
@@ -207,14 +207,16 @@ if __name__ == "__main__":
                         datefmt='%d-%m-%Y %I:%M:%S')
 
     with socketserver.TCPServer(("", port), RequestHandler) as httpd:
+
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server")
+            httpd.vastdb.close()
             httpd.server_close()
             exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
 
-        httpd.db_path = db_path
+        httpd.vastdb = VastDB(db_path)
         logging.debug(f"Database path: {db_path}")
         logging.debug(f"Server listening on port {port}")
         try:

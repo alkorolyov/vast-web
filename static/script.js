@@ -102,8 +102,8 @@ function unpackJSON(packed) {
     info = {
         'gpu': `${num_gpus} x ${hw['gpu_name']}`,
         'pcie': `${hw['pci_gen']}.0 x${hw['gpu_lanes']}\t\t\t${avg?.pcie_bw_avg/10 ?? 0 }Gb/s`,
-        'cpu': `${hw['cpu_cores']/num_gpus}C\t\t${cpu_ram/num_gpus}GB\t\t\t${hw['cpu_name']}`,
-        'disk': `${disk_space/num_gpus}GB\t${avg?.disk_bw_avg ?? 0}MB/s\t\t${hw['disk_name']}`,
+        'cpu': `${Math.round(hw['cpu_cores']/num_gpus)}C\t\t${Math.round(cpu_ram/num_gpus)}GB\t\t\t${hw['cpu_name']}`,
+        'disk': `${Math.round(disk_space/num_gpus)}GB\t${avg?.disk_bw_avg ?? 0}MB/s\t\t${hw['disk_name']}`,
         'inet': `${avg?.inet_down_avg ?? 0}\t\t${avg?.inet_up_avg ?? 0} Mbit/s`,
         'mobo_name': hw['mobo_name'],
 
