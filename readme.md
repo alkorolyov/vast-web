@@ -1,0 +1,1 @@
+git clone https://github.com/alkorolyov/vast-web; cd vast-web; sudo bash ./install.sh
