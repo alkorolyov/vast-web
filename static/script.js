@@ -93,10 +93,7 @@ function unpackJSON(packed) {
     // console.log('packed_json:   ', packed);
 
     let hw = packed.hardware_ts.at(-1);
-    let avg = packed.avg_ts.at(-1);
-    if (!avg) {
-        avg = packed.avg_snp.at(-1);
-    }
+    let avg = packed.avg_ts.at(-1); // can be zero when machine is less than day online
     let eod = packed.eod_snp[0];
     let num_gpus = hw['num_gpus']
     const cpu_ram = packed.cpu_ram_snp[0].cpu_ram;
@@ -105,10 +102,10 @@ function unpackJSON(packed) {
 
     info = {
         'gpu': `${num_gpus} x ${hw['gpu_name']}`,
-        'pcie': `${hw['pci_gen']}.0 x${hw['gpu_lanes']}\t\t\t${avg['pcie_bw_avg'] / 10}Gb/s`,
+        'pcie': `${hw['pci_gen']}.0 x${hw['gpu_lanes']}\t\t\t${avg['pcie_bw_avg'] || 0 / 10}Gb/s`,
         'cpu': `${hw['cpu_cores']/num_gpus}C\t\t${cpu_ram/num_gpus}GB\t\t\t${hw['cpu_name']}`,
-        'disk': `${disk_space/num_gpus}GB\t${avg['disk_bw_avg']}MB/s\t\t${hw['disk_name']}`,
-        'inet': `${avg['inet_down_avg']}\t\t${avg['inet_up_avg']} Mbit/s`,
+        'disk': `${disk_space/num_gpus}GB\t${avg['disk_bw_avg'] || 0}MB/s\t\t${hw['disk_name']}`,
+        'inet': `${avg['inet_down_avg'] || 0}\t\t${avg['inet_up_avg'] || 0} Mbit/s`,
         'mobo_name': hw['mobo_name'],
 
         // 'cpu_name': hw['cpu_name'],
