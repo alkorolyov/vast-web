@@ -12,6 +12,7 @@ DB_PATH="/var/lib/vast-stats/vast.db"
 
 USER="vast-stats"
 GROUP="vast-stats"
+SERVICE_NAME='vast-web'
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
@@ -39,6 +40,7 @@ cp -r src $INSTALL_DIR
 cp -r static $INSTALL_DIR
 chown -R $USER:$GROUP $INSTALL_DIR
 chown -R $USER:$GROUP $DATA_DIR
+
 
 echo "=> Restart service"
 systemctl start $SERVICE_NAME
