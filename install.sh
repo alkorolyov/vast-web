@@ -12,6 +12,7 @@ DB_PATH="/var/lib/vast-stats/vast.db"
 
 USER="vast-stats"
 GROUP="vast-stats"
+SERVICE_NAME='vast-web'
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
@@ -51,8 +52,6 @@ echo "=> Install pip requirements"
 sudo -u $USER python3 -m pip -q install -r requirements.txt
 
 echo "=> Create service"
-
-SERVICE_NAME='vast-web'
 
 SERVICE_CONTENT="
 [Unit]
