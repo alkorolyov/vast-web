@@ -94,6 +94,9 @@ function unpackJSON(packed) {
 
     let hw = packed.hardware_ts.at(-1);
     let avg = packed.avg_ts.at(-1);
+    if (!avg) {
+        avg = packed.avg_snp.at(-1);
+    }
     let eod = packed.eod_snp[0];
     let num_gpus = hw['num_gpus']
     const cpu_ram = packed.cpu_ram_snp[0].cpu_ram;
