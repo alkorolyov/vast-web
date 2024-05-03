@@ -10,8 +10,8 @@ INSTALL_DIR="/opt/vast-web"
 DATA_DIR="/var/lib/vast-web"
 DB_PATH="/var/lib/vast-stats/vast.db"
 
-USER="vast-stats"
-GROUP="vast-stats"
+USER="vast-web"
+GROUP="vast-web"
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
@@ -34,7 +34,7 @@ useradd -rs /bin/false $USER -d $INSTALL_DIR
 
 echo "=> Copy sources to $INSTALL_DIR"
 cp main.py $INSTALL_DIR
-cp update.sh $INSTALL_DIR
+cp update.sh $INSTALL_DIR || echo 'no update.sh'
 cp -r src $INSTALL_DIR
 cp -r static $INSTALL_DIR
 chown -R $USER:$GROUP $INSTALL_DIR
@@ -88,7 +88,7 @@ fi
 echo -e "=> Service status: $status"
 
 echo "=> Remove /tmp files"
-rm -rf /tmp/vast-stats
+rm -rf /tmp/vast-web
 
 echo "=> Install complete"
 
