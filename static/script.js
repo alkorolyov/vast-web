@@ -1,3 +1,131 @@
+const plotForm = document.getElementById("plot-form");
+const plotContainer = document.getElementById("plot-container");
+const infoContainer = document.getElementById("info-container");
+let plots = null;
+
+function singlePlot(timeseries, name, optsShared) {
+    let color = Colors.get();
+    const opts = {
+        ...optsShared,
+        series: [
+            {},
+            {
+                label: name,
+                stroke: color,
+                fill: hexToRGBA(color, 0.1),
+                width: 1/window.devicePixelRatio,
+            },
+        ],
+    };
+    plots[name] = new uPlot(opts, timeseries, plotContainer);
+}
+
+function createPlots(data) {
+    const windowWidth = window.innerWidth //* window.devicePixelRatio;
+    const windowHeight = window.innerHeight //* window.devicePixelRatio;
+    plots = {};
+
+    let muSync = uPlot.sync("moo");
+    let timeseries = data.timeseries;
+
+    const cursorOpts = {
+        lock: true,
+        focus: {
+            prox: 16,
+        },
+        sync: {
+            key: muSync.key,
+            setSeries: true,
+        },
+    };
+
+    let optsShared = {
+        width: windowWidth * 0.5, // 80% of window width
+        height: windowHeight * 0.25, // 60% of window height
+        cursor: cursorOpts,
+        class: "plot-container",
+    };
+
+    for (const key of Object.keys(timeseries)) {
+        let plotData = [timeseries[key][0], timeseries[key][1]]
+        singlePlot(timeseries[key], key, optsShared);
+    }
+
+}
+
+function updatePlots(data) {
+    let timeseries = data.timeseries
+    console.log('plots', plots);
+    console.log('plots keys', Object.keys(plots));
+    // update existing plots with new data
+    for (const key of Object.keys(plots)) {
+        // console.log('key', key);
+        plots[key].setData(timeseries[key]);
+        // let plotTitle = document.getElementsByClassName("u-title");
+        // plotTitle[i].textContent = `machine_id: ${machineId}`;
+
+    }
+}
+
+function updateInfo(data) {
+    let info = data.info;
+    infoContainer.innerHTML = "";
+    for (const key of Object.keys(info)) {
+        // let span = `<span style="display: inline-block; width: 120px">${key}</span>` + `<span>${info[key]}</span><br>`;
+        let html = `<td>${key}</td><td>${info[key]}</td>`
+        infoContainer.innerHTML = infoContainer.innerHTML.concat(html);
+    }
+}
+
+// Function to fetch data and update plot
+function handleSubmitForm() {
+    // Get form values
+    const machineId = document.getElementById("machine-id").value;
+    const fromDate = document.getElementById("from-date").value;
+    const toDate = document.getElementById("to-date").value;
+    console.log(machineId, fromDate, toDate);
+
+    let url = getUrl(machineId, fromDate, toDate);
+
+    // Show loading spinner and disable button
+    showLoading();
+
+    // Fetch data from server
+    fetch(url)
+        .then(response => response.json())
+        .then(packed => unpackJSON(packed))
+        .then(data => {
+            data.timeseries = fillMissingValues(data.timeseries);
+            data.timeseries = costPerGPU(data.timeseries);
+            return data;
+        })
+        .then(data => {
+            // console.log(data);
+            // console.log(data[0]);
+            // Hide loading spinner and enable button
+            hideLoading();
+
+            updateInfo(data);
+
+            if (plots) {
+                updatePlots(data);
+            } else {
+                createPlots(data);
+            }
+        })
+        .catch(error => {
+            // Hide loading spinner and enable button
+            hideLoading();
+            console.error('Error fetching data:', error);
+        });
+}
+
+// Event listener to update plot when the form is submitted
+plotForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    handleSubmitForm();
+});
+
 
 Colors = {};
 Colors.names = {
