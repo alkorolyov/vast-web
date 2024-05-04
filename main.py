@@ -8,6 +8,7 @@ from time import time
 
 import http.server
 import socketserver
+import socket
 import signal
 import sqlite3
 import argparse
@@ -207,13 +208,16 @@ if __name__ == "__main__":
                         datefmt='%d-%m-%Y %I:%M:%S')
 
     with socketserver.TCPServer(("", port), RequestHandler) as httpd:
+        httpd.allow_reuse_address = True
 
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server")
             httpd.vastdb.close()
-            httpd.shutdown()
+            # httpd.shutdown()
             httpd.server_close()
-            httpd.socket.close()
+            # Close any resources associated with the server
+            # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
+            # httpd.socket.close()
             exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
@@ -233,5 +237,3 @@ if __name__ == "__main__":
             httpd.shutdown()
             httpd.server_close()
             sys.exit(1)
-
-
