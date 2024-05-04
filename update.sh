@@ -33,9 +33,8 @@ cd $NAME/
 echo "=> Create $USER user/group"
 useradd -rs /bin/false $USER -d $INSTALL_DIR
 
-echo "=> Copy sources to $INSTALL_DIR"
+echo "=> Update sources at $INSTALL_DIR"
 \cp -rf main.py $INSTALL_DIR
-\cp -rf update.sh $INSTALL_DIR
 \cp -rf src $INSTALL_DIR
 \cp -rf static $INSTALL_DIR
 chown -R $USER:$GROUP $INSTALL_DIR

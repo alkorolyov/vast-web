@@ -85,8 +85,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         logging.debug(f"Received request: {self.request}")
-
-        if self.request.raddr[0] not in const.IP_LIST:
+        if self.request.getsockname()[0] not in const.IP_LIST:
             self.send_error(HTTPStatus.BAD_REQUEST)
 
         parsed_url = urlparse(self.path)
