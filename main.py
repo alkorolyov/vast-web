@@ -210,30 +210,39 @@ if __name__ == "__main__":
     with socketserver.TCPServer(("", port), RequestHandler) as httpd:
         httpd.allow_reuse_address = True
 
+
         def sigterm_handler(signum, frame):
-            logging.warning("[SIGTERM] Shutting down server")
+            logging.warning("[SIGTERM] Shutting down server ...")
+
+            logging.info("[SIGTERM] httpd.vastdb.close()")
             httpd.vastdb.close()
+            logging.info("[SIGTERM] httpd.shutdown()")
             httpd.shutdown()
+
+            logging.info("[SIGTERM] Server shut down")
+            # logging.warning("[SIGTERM] httpd.server_close()")
             # httpd.server_close()
             # Close any resources associated with the server
             # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
             # httpd.socket.close()
             exit(0)
 
+
         signal.signal(signal.SIGTERM, sigterm_handler)
 
         httpd.vastdb = VastDB(db_path)
         logging.debug(f"Database path: {db_path}")
         logging.debug(f"Server listening on port {port}")
+
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
             logging.debug("Keyboard interrupt received, shutting down server")
+            httpd.vastdb.close()
             httpd.shutdown()
-            httpd.server_close()
             sys.exit(0)  # Optional, to exit the script after cleanup
         except Exception as e:
             logging.debug(get_error_info(e))
+            httpd.vastdb.close()
             httpd.shutdown()
-            httpd.server_close()
             sys.exit(1)
