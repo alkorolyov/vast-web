@@ -233,11 +233,11 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             logging.debug("Keyboard interrupt received, shutting down server")
             httpd.vastdb.close()
-            threading.Thread(target=httpd.shutdown).start()
+            httpd.shutdown()
             sys.exit(0)  # Optional, to exit the script after cleanup
 
         except Exception as e:
             logging.debug(get_error_info(e))
             httpd.vastdb.close()
-            threading.Thread(target=httpd.shutdown).start()
+            httpd.shutdown()
             sys.exit(1)
