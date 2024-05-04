@@ -220,14 +220,15 @@ if __name__ == "__main__":
             # httpd.server_close()
 
             logging.info("[SIGTERM] httpd.shutdown()")
-            httpd.shutdown()
+
+            import threading
+            threading.Thread(target=httpd.shutdown).start()
 
             logging.info("[SIGTERM] Server shut down")
             # Close any resources associated with the server
             # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
             # httpd.socket.close()
-            exit(0)
-
+            sys.exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
 
