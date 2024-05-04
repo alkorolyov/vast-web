@@ -213,6 +213,7 @@ if __name__ == "__main__":
             httpd.vastdb.close()
             httpd.shutdown()
             httpd.server_close()
+            httpd.socket.close()
             exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
