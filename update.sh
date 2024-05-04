@@ -31,9 +31,8 @@ git clone https://github.com/alkorolyov/$NAME/
 cd $NAME/
 
 echo "=> Update sources dir: $INSTALL_DIR"
-mkdir rm -rf $INSTALL_DIR
+rm -rf $INSTALL_DIR
 mkdir $INSTALL_DIR
-
 
 echo "=> Create $USER user/group"
 useradd -rs /bin/false $USER -d $INSTALL_DIR
@@ -64,4 +63,4 @@ echo -e "=> Service status: $status"
 echo "=> Remove /tmp files"
 rm -rf /tmp/$NAME
 
-echo "=> Install complete"
+echo "=> Update complete"

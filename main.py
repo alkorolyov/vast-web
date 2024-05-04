@@ -86,6 +86,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         logging.debug(f"Received request: {self.request}")
 
+        if self.request.raddr[0] not in const.IP_LIST:
+            self.send_error(HTTPStatus.BAD_REQUEST)
+
         parsed_url = urlparse(self.path)
         logging.debug(f"parsed_url: {parsed_url.path}")
         query_params = parse_qs(parsed_url.query)
