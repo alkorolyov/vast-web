@@ -30,9 +30,10 @@ cd /tmp
 git clone https://github.com/alkorolyov/$NAME/
 cd $NAME/
 
-echo "=> Create project dir: $INSTALL_DIR $DATA_DIR"
-mkdir $INSTALL_DIR || rm -rf $INSTALL_DIR; mkdir $INSTALL_DIR
-mkdir $DATA_DIR
+echo "=> Update sources dir: $INSTALL_DIR"
+mkdir rm -rf $INSTALL_DIR
+mkdir $INSTALL_DIR
+
 
 echo "=> Create $USER user/group"
 useradd -rs /bin/false $USER -d $INSTALL_DIR
