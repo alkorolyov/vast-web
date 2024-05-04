@@ -207,21 +207,22 @@ if __name__ == "__main__":
                         level=log_level,
                         datefmt='%d-%m-%Y %I:%M:%S')
 
-    with socketserver.TCPServer(("", port), RequestHandler) as httpd:
+    with socketserver.ThreadingTCPServer(("", port), RequestHandler) as httpd:
         httpd.allow_reuse_address = True
-
 
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server ...")
 
             logging.info("[SIGTERM] httpd.vastdb.close()")
             httpd.vastdb.close()
+
+            # logging.warning("[SIGTERM] httpd.server_close()")
+            # httpd.server_close()
+
             logging.info("[SIGTERM] httpd.shutdown()")
             httpd.shutdown()
 
             logging.info("[SIGTERM] Server shut down")
-            # logging.warning("[SIGTERM] httpd.server_close()")
-            # httpd.server_close()
             # Close any resources associated with the server
             # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
             # httpd.socket.close()
