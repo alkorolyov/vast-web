@@ -92,8 +92,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
         if parsed_url.path == '/stats':
             self.handle_stats_request(query_params)
-        elif parsed_url.path == '/test':
-            self.handle_test_request()
+        # elif parsed_url.path == '/test':
+        #     self.handle_test_request()
         else:
             super().do_GET()
 
@@ -211,6 +211,7 @@ if __name__ == "__main__":
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server")
             httpd.vastdb.close()
+            httpd.shutdown()
             httpd.server_close()
             exit(0)
 
@@ -223,10 +224,12 @@ if __name__ == "__main__":
             httpd.serve_forever()
         except KeyboardInterrupt:
             logging.debug("Keyboard interrupt received, shutting down server")
+            httpd.shutdown()
             httpd.server_close()
             sys.exit(0)  # Optional, to exit the script after cleanup
         except Exception as e:
             logging.debug(get_error_info(e))
+            httpd.shutdown()
             httpd.server_close()
             sys.exit(1)
 
