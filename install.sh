@@ -6,13 +6,15 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
-INSTALL_DIR="/opt/vast-web"
-DATA_DIR="/var/lib/vast-web"
+NAME='vast-web'
+
+INSTALL_DIR="/opt/$NAME"
+DATA_DIR="/var/lib/$NAME"
 DB_PATH="/var/lib/vast-stats/vast.db"
 
-USER="vast-stats"
-GROUP="vast-stats"
-SERVICE_NAME='vast-web'
+USER=$NAME
+GROUP=$NAME
+SERVICE_NAME=$NAME
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
@@ -23,8 +25,8 @@ fi
 
 echo "=> Git clone sources to /tmp"
 cd /tmp
-git clone https://github.com/alkorolyov/vast-web/
-cd vast-web/
+git clone https://github.com/alkorolyov/$NAME/
+cd $NAME/
 
 echo "=> Create project dirs: $INSTALL_DIR $DATA_DIR"
 mkdir $INSTALL_DIR || rm -rf $INSTALL_DIR; mkdir $INSTALL_DIR
@@ -63,7 +65,7 @@ Type=simple
 User=$USER
 Group=$GROUP
 WorkingDirectory=$INSTALL_DIR
-ExecStart=python3 $INSTALL_DIR/main.py --db_path $DB_PATH --log_path $DATA_DIR/web.log
+ExecStart=python3 $INSTALL_DIR/main.py --db_path $DB_PATH --log_path $DATA_DIR/log
 Restart=on-failure
 
 [Install]
@@ -87,7 +89,7 @@ fi
 echo -e "=> Service status: $status"
 
 echo "=> Remove /tmp files"
-rm -rf /tmp/vast-web
+rm -rf /tmp/$NAME
 
 echo "=> Install complete"
 
