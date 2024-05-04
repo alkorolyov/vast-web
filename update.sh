@@ -30,18 +30,14 @@ cd /tmp
 git clone https://github.com/alkorolyov/$NAME/
 cd $NAME/
 
-echo "=> Update sources dir: $INSTALL_DIR"
-rm -rf $INSTALL_DIR
-mkdir $INSTALL_DIR
-
 echo "=> Create $USER user/group"
 useradd -rs /bin/false $USER -d $INSTALL_DIR
 
 echo "=> Copy sources to $INSTALL_DIR"
-cp main.py $INSTALL_DIR
-cp update.sh $INSTALL_DIR
-cp -r src $INSTALL_DIR
-cp -r static $INSTALL_DIR
+\cp -rf main.py $INSTALL_DIR
+\cp -rf update.sh $INSTALL_DIR
+\cp -rf src $INSTALL_DIR
+\cp -rf static $INSTALL_DIR
 chown -R $USER:$GROUP $INSTALL_DIR
 chown -R $USER:$GROUP $DATA_DIR
 
