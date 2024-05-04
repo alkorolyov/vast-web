@@ -6,13 +6,14 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
-INSTALL_DIR="/opt/vast-web"
-DATA_DIR="/var/lib/vast-web"
-DB_PATH="/var/lib/vast-stats/vast.db"
+NAME='vast-web'
 
-USER="vast-stats"
-GROUP="vast-stats"
-SERVICE_NAME='vast-web'
+INSTALL_DIR="/opt/$NAME"
+DATA_DIR="/var/lib/$NAME"
+
+USER=$NAME
+GROUP=$NAME
+SERVICE_NAME=$NAME
 
 echo -e "=> ${GREEN}Start installation of Vast Webserver service${NC}"
 
@@ -26,8 +27,8 @@ systemctl stop $SERVICE_NAME
 
 echo "=> Git clone sources to /tmp"
 cd /tmp
-git clone https://github.com/alkorolyov/vast-web/
-cd vast-web/
+git clone https://github.com/alkorolyov/$NAME/
+cd $NAME/
 
 echo "=> Create project dir: $INSTALL_DIR $DATA_DIR"
 mkdir $INSTALL_DIR || rm -rf $INSTALL_DIR; mkdir $INSTALL_DIR
@@ -60,6 +61,6 @@ fi
 echo -e "=> Service status: $status"
 
 echo "=> Remove /tmp files"
-rm -rf /tmp/vast-web
+rm -rf /tmp/$NAME
 
 echo "=> Install complete"

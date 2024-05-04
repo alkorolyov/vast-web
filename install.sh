@@ -66,7 +66,7 @@ User=$USER
 Group=$GROUP
 WorkingDirectory=$INSTALL_DIR
 ExecStart=python3 $INSTALL_DIR/main.py --db_path $DB_PATH --log_path $DATA_DIR/log
-Restart=on-failure
+#Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
