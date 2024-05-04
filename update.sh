@@ -21,6 +21,9 @@ if [[ $UID -ne 0 ]]; then
     exit
 fi
 
+echo "=> Stop service"
+systemctl stop $SERVICE_NAME
+
 echo "=> Git clone sources to /tmp"
 cd /tmp
 git clone https://github.com/alkorolyov/vast-web/
