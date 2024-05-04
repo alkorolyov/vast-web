@@ -1,0 +1,16 @@
+.fixed-layout {
+    margin-top: 5px;
+    position: relative;
+    width: 490px;
+}
+.abspos {
+    position: absolute;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.ellipsize {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

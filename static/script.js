@@ -69,11 +69,13 @@ function updatePlots(data) {
 
 function updateInfo(data) {
     let info = data.info;
-    infoContainer.innerHTML = "";
     for (const key of Object.keys(info)) {
         // let span = `<span style="display: inline-block; width: 120px">${key}</span>` + `<span>${info[key]}</span><br>`;
-        let html = `<td>${key}</td><td>${info[key]}</td>`
-        infoContainer.innerHTML = infoContainer.innerHTML.concat(html);
+        let html = document.getElementById(key);
+        console.log(key, html);
+        if (html === undefined)
+            console.log('key not found:', key);
+        html.innerHTML = info[key];
     }
 }
 
@@ -218,41 +220,48 @@ function unpackJSON(packed) {
     ts.cost = staircaseFill(ts.cost);
     ts.num_gpus = staircaseFill(ts.num_gpus);
 
-    // console.log('packed_json:   ', packed);
+    console.log('packed_json:   ', packed);
 
     let hw = packed.hardware_ts.at(-1);
     let avg = packed.avg_ts.at(-1); // can be zero when machine is less than day online
     let eod = packed.eod_snp[0];
-    let num_gpus = hw['num_gpus']
+    let num_gpus = hw.num_gpus;
     const cpu_ram = packed.cpu_ram_snp[0].cpu_ram;
     const disk_space = packed.disk_snp[0].disk_space;
 
+    let verified_map = {
+        0: 'unverified',
+        1: 'verified',
+        2: 'deverified',
+        3: 'de-verified',
+    }
+
     info = {
-        'gpu': `${num_gpus} x ${hw['gpu_name']}`,
-        'pcie': `${hw['pci_gen']}.0 x${hw['gpu_lanes']}\t${avg?.pcie_bw_avg/10 ?? 0 }Gb/s`,
-        'cpu': `${Math.round(hw['cpu_cores']/num_gpus)}C\t\t${Math.round(cpu_ram/num_gpus)}GB\t\t\t${hw['cpu_name']}`,
-        'disk': `${Math.round(disk_space/num_gpus)}GB\t${avg?.disk_bw_avg ?? 0}MB/s\t\t${hw['disk_name']}`,
-        'inet': `${avg?.inet_down_avg ?? 0}\t\t${avg?.inet_up_avg ?? 0} Mbit/s`,
-        'mobo_name': hw['mobo_name'],
-
-        // 'cpu_name': hw['cpu_name'],
-        // 'cpu_cores': hw['cpu_cores'],
-        // 'cpu_ram': cpu_ram,
-
-        // 'disk_bw': avg['disk_bw_avg'],
-        // 'disk_space': disk_space,
-
-        // 'inet_up': avg['inet_up_avg'],
-        // 'inet_down': avg['inet_down_avg'],
-        'country': eod['country'],
-        'isp': eod['isp'],
-
-
-        // 'disk_name': hw['disk_name'],
-
+        'public_ipaddr': `${eod.public_ipaddr}`,
+        'country': `${eod.country}`,
+        'isp': `${eod.isp}`,
+        'gpu_name_count': `${num_gpus}x ${hw.gpu_name}`,
+        'total_flops': `${hw.total_flops} <span class="small-label" style="font-size: 10px;">&nbsp;TFLOPS</span>`,
+        'machine_id': `${eod.machine_id}`,
+        'verification': `${verified_map[eod.verification]}`,
+        'gpu_ram': `${Math.round(hw.gpu_ram / 1000)} GB`,
+        'gpu_mem_bw': `${avg?.gpu_mem_bw_avg} GB/s`,
+        'mobo_name': `${hw.mobo_name}`,
+        'pci_type': `PCIE ${hw.pci_gen}.0 ${hw.gpu_lanes}x`,
+        'pci_bw': `${avg?.pcie_bw_avg / 10} GB/s`,
+        'cpu_name': `${hw.cpu_name}`,
+        'cpu_cores': `${hw.cpu_cores} cpu`,
+        'cpu_ram': `${cpu_ram} GB`,
+        'disk_name': `${hw.disk_name}`,
+        'disk_bw': `${avg?.disk_bw_avg} MB/s`,
+        'disk_space': `${disk_space} GB`,
+        'inet_up': `${avg?.inet_up_avg} Mbps`,
+        'inet_down': `${avg?.inet_down_avg} Mbps`,
+        'direct_port_count': `${eod.direct_port_count} ports`,
+        'reliability': `${ts.reliability[1].at(-1)}%`,
     };
 
-    // console.log('packed_json:', packed);
+    console.log('info', info);
 
     let data = {
         'info': info,
