@@ -213,8 +213,8 @@ if __name__ == "__main__":
         def sigterm_handler(signum, frame):
             logging.warning("[SIGTERM] Shutting down server")
             httpd.vastdb.close()
-            # httpd.shutdown()
-            httpd.server_close()
+            httpd.shutdown()
+            # httpd.server_close()
             # Close any resources associated with the server
             # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
             # httpd.socket.close()
