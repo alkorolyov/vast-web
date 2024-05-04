@@ -8,7 +8,7 @@ from time import time
 
 import http.server
 import socketserver
-import socket
+import threading
 import signal
 import sqlite3
 import argparse
@@ -216,13 +216,9 @@ if __name__ == "__main__":
             httpd.vastdb.close()
 
             # shutdown in separate thread
-            import threading
             threading.Thread(target=httpd.shutdown).start()
 
-            logging.info("[SIGTERM] Server shut down")
-            # Close any resources associated with the server
-            # httpd.socket.shutdown(socket.SHUT_RDWR)  # Shutdown both read and write operations
-            # httpd.socket.close()
+            logging.info("[SIGTERM] Server stopped")
             sys.exit(0)
 
         signal.signal(signal.SIGTERM, sigterm_handler)
@@ -233,13 +229,15 @@ if __name__ == "__main__":
 
         try:
             httpd.serve_forever()
+
         except KeyboardInterrupt:
             logging.debug("Keyboard interrupt received, shutting down server")
             httpd.vastdb.close()
-            httpd.shutdown()
+            threading.Thread(target=httpd.shutdown).start()
             sys.exit(0)  # Optional, to exit the script after cleanup
+
         except Exception as e:
             logging.debug(get_error_info(e))
             httpd.vastdb.close()
-            httpd.shutdown()
+            threading.Thread(target=httpd.shutdown).start()
             sys.exit(1)
