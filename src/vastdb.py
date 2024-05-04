@@ -63,7 +63,7 @@ class VastDB:
         df = pd.read_sql_query(f"SELECT * FROM {tbl_name}", con=self.conn)
         return df
 
-    def get_machine_stats(self, machine_id: int, from_ts, to_ts):
+    def get_machine_stats(self, machine_id: int, from_ts=None, to_ts=None):
         result = {}
         ts_cols = ['rent_ts', 'reliability_ts', 'cost_ts', 'hardware_ts', 'avg_ts']
         snp_cols = ['eod_snp', 'disk_snp', 'cpu_ram_snp']

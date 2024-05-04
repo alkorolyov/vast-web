@@ -95,8 +95,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
         if parsed_url.path == '/stats':
             self.handle_stats_request(query_params)
-        # elif parsed_url.path == '/test':
-        #     self.handle_test_request()
+        elif parsed_url.path == '/test':
+            self.handle_test_request()
         else:
             super().do_GET()
 
@@ -105,14 +105,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         logging.info(f"Testing request 2 weeks data")
 
         with self.server.vastdb as vastdb:
-            machines_list = vastdb.dbm.table_to_df('machine_host_map').machine_id.sample(10)
+            machines_list = vastdb.table_to_df('machine_host_map').machine_id.sample(10)
 
         times = []
         for machine_id in machines_list:
             start = time()
-            json_data = vastdb.get_machine_stats(machine_id, datetime_to_ts('2024-03-06'), None)
-            # json_data = vastdb.get_machine_stats(machine_id, datetime_to_ts('2024'), None)
-            # json_data = vastdb.get_machine_stats(machine_id, None, None)
+            with self.server.vastdb as vastdb:
+                # json_data = vastdb.get_machine_stats(machine_id, datetime_to_ts('2024-03-06'), None)
+                # json_data = vastdb.get_machine_stats(machine_id, datetime_to_ts('2024'), None)
+                json_data = vastdb.get_machine_stats(machine_id)
             times.append(time_ms(time() - start))
             logging.info(f"machine_id: {machine_id} {times[-1]}ms")
 
@@ -173,7 +174,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def send_html(self, html_content):
         # Send HTML response to client
         self.send_response(HTTPStatus.OK)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
         self.wfile.write(html_content)
 
