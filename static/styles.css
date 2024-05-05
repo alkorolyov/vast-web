@@ -3,6 +3,7 @@
     position: relative;
     width: 490px;
 }
+
 .abspos {
     position: absolute;
     white-space: nowrap;
@@ -13,4 +14,27 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+
+.easytooltip::after {
+    content: attr(tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 3px #0000001f,0 1px 2px #0000003d;
+    background-color: rgba(255, 255, 255, 1);
+    /*background-color: rgba(0, 0, 0, 0.8);*/
+    color: #111111;
+    padding: 5px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    z-index: 999;
+}
+
+.easytooltip:hover::after {
+    visibility: visible;
+    opacity: 1;
 }
